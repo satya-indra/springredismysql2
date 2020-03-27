@@ -1,0 +1,77 @@
+# Version of yml standard
+version: '3'
+
+services:
+  mysqldb:
+    build: ./Mysql/
+    container_name: mysqlspringrest
+    image: mysqlspringrest
+   # volumes:
+       # - mysql-db:/var/lib/mysql
+    # volumes:
+    #    # - ./docker/mariadb/data:/var/lib/mysql:rw
+    #     - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+    - '13306:3306'
+
+   # command: ["/wait-for-it.sh", "redisdb:6379" ]
+
+
+  redisdb:
+    build: ./Redis/
+    container_name: redisspringrest
+    image: redisspringrest
+    # volumes:
+        # - mysql-db:/var/lib/mysql
+    # volumes:
+    #    # - ./docker/mariadb/data:/var/lib/mysql:rw
+    #     - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+    - '16379:6379'
+    
+
+  springrest:
+    build: ./SpringRest/
+    container_name: springrestapi
+    image: springrestapi
+
+    ports:
+    - '8082:8082'
+    depends_on:
+      - mysqldb
+      - redisdb
+    links:
+      - mysqldb
+      - redisdb
+
+    command: ["/wait-for-it.sh", "mysql:3306" , "--", "java", "-jar",  "springrestapi.jar"]
+
+
+
+
+    # command: ["./wait-for-it/wait-for-it.sh", "database:13306", "--", "sh",  "run.sh"]
+    # command: ["./wait-for-it/wait-for-it.sh", "redisdb:16379", "--", "sh",  "run.sh"]
+    
+    
+
+      
+
+    
+    
+   #CMD ["./wait-for-it.sh", "carparkdb:13306"]
+
+    
+    
+    #depends_on:
+     #- database
+    #restart: always
+    
+    
+  # client:
+  #   build: ./Client/carpark/
+  #   container_name: carparkangular
+  #   image: carparkangular
+  #   ports:
+  #   - '9090:80'
+
+   
